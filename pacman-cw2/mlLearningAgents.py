@@ -200,7 +200,13 @@ class QLearnAgent(Agent):
         Returns:
             Number of times that the action has been taken in a given state
         """
-        "*** YOUR CODE HERE ***"
+        if state not in self.actionCount:
+            return 0
+        if action not in self.actionCount[state]:
+            return 0
+        return self.actionCount[state][action]
+
+
         util.raiseNotDefined()
 
     # WARNING: You will be tested on the functionality of this method
