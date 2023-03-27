@@ -48,7 +48,45 @@ class GameStateFeatures:
         """
 
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+        self.walls = state.getWalls()
+        pacman = state.getPacmanPosition()
+        walls = self.walls
+        
+
+        print( "Game walls\n", self.walls)
+        print( "Pacman position\n", pacman)
+        
+
+        self.minX = 1000
+        self.minY = 1000
+        self.maxX = 0
+        self.maxY = 0
+        
+        try :
+            for x in range(walls.width):
+                for y in range(walls.height):
+                    if walls[x][y]:
+                        self.minX = min(self.minX, x)
+                        self.minY = min(self.minY, y)
+                        self.maxX = max(self.maxX, x)
+                        self.maxY = max(self.maxY, y)
+        except:
+            pass
+        
+
+        S = []  # all the locations that Pacman can go --- State coordinates. Tuple (x,y) list.
+
+        for x in range(self.maxX):
+            for y in range(self.maxY):
+                if walls[x][y] is False:
+                    S.append((x, y))
+        self.states = S
+        print("States\n", S)
+
+
+
+        # util.raiseNotDefined()
 
 
 class QLearnAgent(Agent):
@@ -81,7 +119,8 @@ class QLearnAgent(Agent):
         self.numTraining = int(numTraining)
         # Count the number of games we have played
         self.episodesSoFar = 0
-
+        self.actionCount = {}
+        
     # Accessor functions for the variable episodesSoFar controlling learning
     def incrementEpisodesSoFar(self):
         self.episodesSoFar += 1
@@ -200,14 +239,16 @@ class QLearnAgent(Agent):
         Returns:
             Number of times that the action has been taken in a given state
         """
+        
+        # S = 
+
         if state not in self.actionCount:
             return 0
         if action not in self.actionCount[state]:
             return 0
         return self.actionCount[state][action]
 
-
-        util.raiseNotDefined()
+        # util.raiseNotDefined()
 
     # WARNING: You will be tested on the functionality of this method
     # DO NOT change the function signature
@@ -263,6 +304,7 @@ class QLearnAgent(Agent):
 
         # Now pick what action to take.
         # The current code shows how to do that but just makes the choice randomly.
+        GameStateFeatures(state)
         return random.choice(legal)
 
     def final(self, state: GameState):
