@@ -1,27 +1,3 @@
-# mlLearningAgents.py
-# parsons/27-mar-2017
-#
-# A stub for a reinforcement learning agent to work with the Pacman
-# piece of the Berkeley AI project:
-#
-# http://ai.berkeley.edu/reinforcement.html
-#
-# As required by the licensing agreement for the PacMan AI we have:
-#
-# Licensing Information:  You are free to use or extend these projects for
-# educational purposes provided that (1) you do not distribute or publish
-# solutions, (2) you retain this notice, and (3) you provide clear
-# attribution to UC Berkeley, including a link to http://ai.berkeley.edu.
-# 
-# Attribution Information: The Pacman AI projects were developed at UC Berkeley.
-# The core projects and autograders were primarily created by John DeNero
-# (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
-# Student side autograding was added by Brad Miller, Nick Hay, and
-# Pieter Abbeel (pabbeel@cs.berkeley.edu).
-
-# This template was originally adapted to KCL by Simon Parsons, but then
-# revised and updated to Py3 for the 2022 course by Dylan Cope and Lin Li
-
 from __future__ import absolute_import
 from __future__ import print_function
 
@@ -48,45 +24,7 @@ class GameStateFeatures:
         """
 
         "*** YOUR CODE HERE ***"
-
-        self.walls = state.getWalls()
-        pacman = state.getPacmanPosition()
-        walls = self.walls
-        
-
-        print( "Game walls\n", self.walls)
-        print( "Pacman position\n", pacman)
-        
-
-        self.minX = 1000
-        self.minY = 1000
-        self.maxX = 0
-        self.maxY = 0
-        
-        try :
-            for x in range(walls.width):
-                for y in range(walls.height):
-                    if walls[x][y]:
-                        self.minX = min(self.minX, x)
-                        self.minY = min(self.minY, y)
-                        self.maxX = max(self.maxX, x)
-                        self.maxY = max(self.maxY, y)
-        except:
-            pass
-        
-
-        S = []  # all the locations that Pacman can go --- State coordinates. Tuple (x,y) list.
-
-        for x in range(self.maxX):
-            for y in range(self.maxY):
-                if walls[x][y] is False:
-                    S.append((x, y))
-        self.states = S
-        print("States\n", S)
-
-
-
-        # util.raiseNotDefined()
+        util.raiseNotDefined()
 
 
 class QLearnAgent(Agent):
@@ -119,8 +57,7 @@ class QLearnAgent(Agent):
         self.numTraining = int(numTraining)
         # Count the number of games we have played
         self.episodesSoFar = 0
-        self.actionCount = {}
-        
+
     # Accessor functions for the variable episodesSoFar controlling learning
     def incrementEpisodesSoFar(self):
         self.episodesSoFar += 1
@@ -160,7 +97,13 @@ class QLearnAgent(Agent):
         Returns:
             The reward assigned for the given trajectory
         """
-        "*** YOUR CODE HERE ***"
+        reward = GameState.getScore()-GameState.score
+        if len(GameState.lastState) > 0:
+            last_state = GameState.lastState[-1]
+            last_action = GameState.lastAction[-1]
+            max_q = GameState.getMaxQ(GameState)
+            GameState.updateQ(last_state, last_action, reward, max_q)
+        
         util.raiseNotDefined()
 
     # WARNING: You will be tested on the functionality of this method
@@ -176,8 +119,8 @@ class QLearnAgent(Agent):
         Returns:
             Q(state, action)
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return self.q_value[(state,action)]
+
 
     # WARNING: You will be tested on the functionality of this method
     # DO NOT change the function signature
@@ -189,7 +132,14 @@ class QLearnAgent(Agent):
         Returns:
             q_value: the maximum estimated Q-value attainable from the state
         """
-        "*** YOUR CODE HERE ***"
+
+        q_list = []
+        for a in state.getLegalPacmanActions():
+            q = self.getQValue(state,a)
+            q_list.append(q)
+        if len(q_list) ==0:
+            return 0
+        return max(q_list)
         util.raiseNotDefined()
 
     # WARNING: You will be tested on the functionality of this method
@@ -208,7 +158,30 @@ class QLearnAgent(Agent):
             nextState: the resulting state
             reward: the reward received on this trajectory
         """
-        "*** YOUR CODE HERE ***"
+            # Constructor, called when we start running the
+    def __init__(self, alpha=0.2, epsilon=0.05, gamma=0.8, numTraining = 10):
+        # alpha       - learning rate
+        # epsilon     - exploration rate
+        # gamma       - discount factor
+        # numTraining - number of training episodes
+        #
+        # These values are either passed from the command line or are
+        # set to the default values above. We need to create and set
+        # variables for them
+        self.alpha = float(alpha)
+        self.epsilon = float(epsilon)
+        self.gamma = float(gamma)
+        self.numTraining = int(numTraining)
+        # Count the number of games we have played
+        self.episodesSoFar = 0
+        # Q-values
+        self.q_value = util.Counter()
+        # current score
+        self.score = 0
+        # last state
+        self.lastState = []
+        # last action
+        self.lastAction = []
         util.raiseNotDefined()
 
     # WARNING: You will be tested on the functionality of this method
@@ -239,16 +212,8 @@ class QLearnAgent(Agent):
         Returns:
             Number of times that the action has been taken in a given state
         """
-        
-        # S = 
-
-        if state not in self.actionCount:
-            return 0
-        if action not in self.actionCount[state]:
-            return 0
-        return self.actionCount[state][action]
-
-        # util.raiseNotDefined()
+        "*** YOUR CODE HERE ***"
+        util.raiseNotDefined()
 
     # WARNING: You will be tested on the functionality of this method
     # DO NOT change the function signature
@@ -287,6 +252,7 @@ class QLearnAgent(Agent):
         Returns:
             The action to take
         """
+        
         # The data we have about the state of the game
         legal = state.getLegalPacmanActions()
         if Directions.STOP in legal:
@@ -304,7 +270,6 @@ class QLearnAgent(Agent):
 
         # Now pick what action to take.
         # The current code shows how to do that but just makes the choice randomly.
-        GameStateFeatures(state)
         return random.choice(legal)
 
     def final(self, state: GameState):
@@ -326,3 +291,9 @@ class QLearnAgent(Agent):
             print('%s\n%s' % (msg, '-' * len(msg)))
             self.setAlpha(0)
             self.setEpsilon(0)
+
+
+
+
+
+
